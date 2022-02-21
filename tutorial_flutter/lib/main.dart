@@ -19,7 +19,22 @@ class TestApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  String text = "";
+
+  void changeText(String text) {
+    this.setState(() {
+      this.text = text;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     //Scaffold widget can contain other widgets
@@ -28,18 +43,25 @@ class HomePage extends StatelessWidget {
         appBar: AppBar(
           title: Text("Hello Bro!"),
         ),
-        body: TextBoxWidget());
+        body: Column(children: <Widget>[
+          TextBoxWidget(
+              this.changeText /*reference to a function, not executing*/),
+          Text(this.text)
+        ]));
   }
 }
 
 class TextBoxWidget extends StatefulWidget {
+  final Function(String) callback;
+
+  TextBoxWidget(this.callback); //{}lo rendono un parametro opzionale
+
   @override
   _TextBoxWidgetState createState() => _TextBoxWidgetState();
 }
 
 class _TextBoxWidgetState extends State<TextBoxWidget> {
   final controller = TextEditingController();
-  String text = "";
 
   @override
   void dispose() {
@@ -47,30 +69,24 @@ class _TextBoxWidgetState extends State<TextBoxWidget> {
     controller.dispose();
   }
 
-  void changeText(text) {
-    if (text == "Clear") { //If the user write Clear, the TextField gets cleared
-      controller.clear();
-      text = "";
-    }
-
-    setState(() {
-      //Force refresh the flutter widget
-      this.text = text;
-    });
+  void click() {
+    widget.callback(controller.text);
+    controller.clear();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: <Widget>[
-      TextField(
-        controller: this.controller,
-        decoration: InputDecoration(
-            prefixIcon: Icon(Icons.messenger_rounded),
-            labelText: "Type something:"),
-        onChanged: (text) => this.changeText(text),
-      ),
-      Text(this.text)
-    ]);
+    return TextField(
+      controller: this.controller,
+      decoration: InputDecoration(
+          prefixIcon: Icon(Icons.messenger_rounded),
+          labelText: "Type something:",
+          suffixIcon: IconButton(
+            icon: Icon(Icons.send_rounded),
+            splashColor: Colors.blueGrey,
+            tooltip: "Post Message",
+            onPressed: this.click,
+          )),
+    );
   }
 }
-
