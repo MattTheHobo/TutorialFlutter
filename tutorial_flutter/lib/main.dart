@@ -4,6 +4,24 @@ void main() {
   runApp(TestApp());
 }
 
+class Post {
+  String body;
+  String author;
+  int likes = 0;
+  bool userLiked = false;
+
+  Post(this.body, this.author);
+
+  void likePost() {
+    this.userLiked = !this.userLiked;
+    if (this.userLiked) {
+      this.likes += 1;
+    } else {
+      this.likes -= 1;
+    }
+  }
+}
+
 class TestApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
@@ -27,11 +45,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String text = "";
+  List<Post> posts = [];
 
-  void changeText(String text) {
+  void newPost(String text) {
     this.setState(() {
-      this.text = text;
+      posts.add(new Post(text, "Matt"));
     });
   }
 
@@ -41,12 +59,15 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
         //In questo caso Scaffold contiene il Widget AppBar che a sua volta contiene il Widget Text
         appBar: AppBar(
-          title: Text("Hello Bro!"),
+          title: Text("Hello"),
         ),
         body: Column(children: <Widget>[
-          TextBoxWidget(
-              this.changeText /*reference to a function, not executing*/),
-          Text(this.text)
+          Expanded(
+              child:
+                  PostList(this.posts)), //Expanded uses all the space possible
+          Expanded(
+              child: TextBoxWidget(
+                  this.newPost /*reference to a function, not executing*/))
         ]));
   }
 }
@@ -87,6 +108,27 @@ class _TextBoxWidgetState extends State<TextBoxWidget> {
             tooltip: "Post Message",
             onPressed: this.click,
           )),
+    );
+  }
+}
+
+class PostList extends StatefulWidget {
+  final List<Post> listItems;
+
+  PostList(this.listItems);
+
+  @override
+  _PostListState createState() => _PostListState();
+}
+
+class _PostListState extends State<PostList> {
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: this.widget.listItems.length,
+      itemBuilder: (context, index) {
+        var post = this.widget.listItems[index];
+      },
     );
   }
 }
