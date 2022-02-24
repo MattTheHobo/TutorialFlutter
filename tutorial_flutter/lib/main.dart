@@ -65,8 +65,9 @@ class _HomePageState extends State<HomePage> {
           Expanded(
               child:
                   PostList(this.posts)), //Expanded uses all the space possible
-          TextBoxWidget(this.newPost /*reference to a function, not executing*/),
-          SizedBox(height: 30)//Custom spacer
+          TextBoxWidget(
+              this.newPost /*reference to a function, not executing*/),
+          SizedBox(height: 30) //Custom spacer
         ]));
   }
 }
@@ -91,6 +92,7 @@ class _TextBoxWidgetState extends State<TextBoxWidget> {
 
   void click() {
     widget.callback(controller.text);
+    FocusScope.of(context).unfocus();
     controller.clear();
   }
 
@@ -121,7 +123,6 @@ class PostList extends StatefulWidget {
 }
 
 class _PostListState extends State<PostList> {
-  
   void like(Function callback) {
     this.setState(() {
       callback();
@@ -149,7 +150,9 @@ class _PostListState extends State<PostList> {
               IconButton(
                 icon: Icon(Icons.thumb_up_alt),
                 onPressed: () => this.like(post.likePost),
-                color: post.userLiked ? Colors.blue : Colors.black,//? = if true, : = else
+                color: post.userLiked
+                    ? Colors.blue
+                    : Colors.black, //? = if true, : = else
               )
             ],
           )
